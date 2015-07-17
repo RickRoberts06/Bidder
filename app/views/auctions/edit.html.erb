@@ -1,0 +1,37 @@
+<div class="col-md-8">
+  <h1><%= @auction.title %></h1>
+  <p>Details: <%= @auction.details %></p>
+  <p>Ends On: <%= @auction.ends_on.strftime("%b %d, %Y") %></p>
+  <p>Reserve Price: <%= number_to_currency(@auction.reserve_price) %></p>
+
+<% if current_user != @auction.user %>
+<div class="bid_form">
+  <%= render partial: "/bids/form" %>
+</div>
+<% end %>
+<hr>
+<br>
+
+<h3>Previous Bids</h3>
+<div class="bids">
+  <% @auction.bids.each do |bid| %>
+  <%= render partial: "/bids/bid", locals: {bid: bid} %>
+  <% end %>
+</div>
+</div>
+
+<div class="well col-md-4">
+  <h3>Current Price:</h3>
+  <% if @auction.bids.any? %>
+    <p><%= number_to_currency(@auction.bids.maximum(:amount)+1) %></p>
+  <% else %>
+    <p>No bids... yet!</p>
+  <% end %>
+  <% if @auction.aasm_state == "published" %>
+    <p>Reserve Price Not Met</p>
+  <% elsif @auction.aasm_state == "reserve_met" %>
+    <p>Reserve Price Met</p>
+  <% else %>
+    <p><%= @auction.aasm_state %></p>
+  <% end %>
+</div>
